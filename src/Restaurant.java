@@ -1,52 +1,54 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Restaurant {
     private String name;
     private String address;
-    private List<Order> orders;
+    private List<Order> orders; // Список заказов (из старой версии)
+    private List<BaseItem> menuPool; // Пул данных для фильтрации (новое требование)
 
-    // Constructor
     public Restaurant(String name, String address) {
         this.name = name;
         this.address = address;
-        this.orders = new ArrayList<>(); // Initialize the list to avoid NullPointerException
+        this.orders = new ArrayList<>();
+        this.menuPool = new ArrayList<>();
     }
 
-    // --- Getter Methods ---
-    public String getName() {
-        return name;
+    // --- Методы для работы с Меню (Поиск, Сортировка, Фильтрация) ---
+    public void addToMenu(BaseItem item) {
+        this.menuPool.add(item);
     }
 
-    public String getAddress() {
-        return address;
+    public void sortByPrice() {
+        menuPool.sort(Comparator.comparingDouble(BaseItem::getPrice));
     }
 
-    public List<Order> getOrders() {
-        return orders;
+    public BaseItem findItem(String name) {
+        return menuPool.stream()
+                .filter(item -> item.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
-    // --- Setter Methods ---
-    public void setName(String name) {
-        this.name = name;
+    public List<BaseItem> filterByMaxPrice(double maxPrice) {
+        return menuPool.stream()
+                .filter(item -> item.getPrice() <= maxPrice)
+                .collect(Collectors.toList());
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    // --- Utility Methods ---
+    // --- Старые методы для работы с заказами ---
     public void addOrder(Order order) {
         this.orders.add(order);
     }
 
+    public List<Order> getOrders() { return orders; }
+    public String getName() { return name; }
+    public String getAddress() { return address; }
+
     @Override
     public String toString() {
-        return "Restaurant{name='" + name + "', address='" + address + "', totalOrders=" + orders.size() + '}';
-    }
-
-    // Custom method for comparison
-    public boolean hasSameName(Restaurant otherRestaurant) {
-        return this.name.equalsIgnoreCase(otherRestaurant.name);
+        return "Restaurant{name='" + name + "', menuSize=" + menuPool.size() + ", totalOrders=" + orders.size() + '}';
     }
 }

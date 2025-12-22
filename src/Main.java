@@ -1,47 +1,64 @@
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
-        // 1. Создаем несколько блюд (MenuItem)
-        MenuItem burger = new MenuItem(1, "Бургер", 450.0);
-        MenuItem fries = new MenuItem(2, "Картошка фри", 150.0);
-        MenuItem cola = new MenuItem(3, "Кола", 100.0);
-
-        // Используем сеттер, чтобы изменить цену (например, акция)
-        cola.setPrice(80.0);
-
-        // 2. Создаем заказы (Order)
-        Order order1 = new Order(101);
-        order1.addItem(burger, 2); // 2 бургера
-        order1.addItem(cola, 1);   // 1 кола
-
-        Order order2 = new Order(102);
-        order2.addItem(fries, 3);  // 3 картошки
-
-        // 3. Создаем ресторан
+        Scanner scanner = new Scanner(System.in);
         Restaurant myRestaurant = new Restaurant("Best Burger", "ул. Ленина, 5");
-        myRestaurant.addOrder(order1);
-        myRestaurant.addOrder(order2);
 
-        // 4. Вывод информации в консоль
-        System.out.println("--- Информация о ресторане ---");
-        System.out.println("Название: " + myRestaurant.getName());
-        System.out.println("Заказов в системе: " + myRestaurant.getOrders().size());
+        // 1. Наполняем меню (Полиморфизм: добавляем и еду, и напитки в один список)
+        myRestaurant.addToMenu(new FoodItem("Бургер", 450.0, 600));
+        myRestaurant.addToMenu(new FoodItem("Картошка фри", 150.0, 300));
+        myRestaurant.addToMenu(new DrinkItem("Кола", 100.0, true));
+        myRestaurant.addToMenu(new DrinkItem("Чай", 80.0, false));
 
-        System.out.println("\n--- Детали заказов ---");
-        System.out.println(order1.toString());
-        System.out.println(order2.toString());
+        System.out.println("=== Система управления рестораном " + myRestaurant.getName() + " ===");
 
-        // 5. Сравнение объектов (как требовалось в задании)
-        System.out.println("\n--- Сравнение ---");
+        while (true) {
+            System.out.println("\nВыберите действие:");
+            System.out.println("1. Показать меню | 2. Сортировать по цене | 3. Поиск | 4. Фильтр цены | 5. Создать заказ | 0. Выход");
+            System.out.print("> ");
 
-        // Сравним стоимость заказов
-        if (order1.getTotalAmount() > order2.getTotalAmount()) {
-            System.out.println("Заказ #101 дороже заказа #102");
-        } else {
-            System.out.println("Заказ #102 дороже или равен заказу #101");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Очистка
+
+            if (choice == 0) break;
+
+            switch (choice) {
+                case 1:
+                    System.out.println("--- Текущее меню ---");
+                    // Демонстрация полиморфизма: вызываем getDescription() у разных объектов
+                    for (BaseItem item : myRestaurant.filterByMaxPrice(10000)) {
+                        System.out.println(item.getDescription());
+                    }
+                    break;
+                case 2:
+                    myRestaurant.sortByPrice();
+                    System.out.println("Меню отсортировано по возрастанию цены.");
+                    break;
+                case 3:
+                    System.out.print("Введите название для поиска: ");
+                    String name = scanner.nextLine();
+                    BaseItem found = myRestaurant.findItem(name);
+                    System.out.println(found != null ? "Найдено: " + found.getDescription() : "Блюдо не найдено.");
+                    break;
+                case 4:
+                    System.out.print("Введите максимальную цену: ");
+                    double maxP = scanner.nextDouble();
+                    myRestaurant.filterByMaxPrice(maxP).forEach(i -> System.out.println(i.getDescription()));
+                    break;
+                case 5:
+                    // Пример создания старого объекта Order
+                    Order order = new Order(201);
+                    BaseItem itemForOrder = myRestaurant.findItem("Бургер");
+                    if (itemForOrder != null) {
+                        order.addItem(itemForOrder, 2);
+                        myRestaurant.addOrder(order);
+                        System.out.println("Заказ создан: " + order.toString());
+                    }
+                    break;
+            }
         }
-
-        // Сравним названия блюд
-        boolean isSameFood = burger.getName().equals(fries.getName());
-        System.out.println("Бургер и Фри — это одно и то же блюдо? " + isSameFood);
+        System.out.println("Программа завершена.");
+        scanner.close();
     }
 }
