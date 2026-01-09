@@ -8,6 +8,9 @@ public abstract class BaseItem {
         this.name = name;
         this.price = price;
     }
+    public void setPrice(double price) {
+        this.price = price;
+    }
 
     // Геттеры
     public String getName() { return name; }

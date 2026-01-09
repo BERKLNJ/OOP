@@ -42,6 +42,9 @@ public class Restaurant {
     public void addOrder(Order order) {
         this.orders.add(order);
     }
+    public List<BaseItem> getMenu() {
+        return menuPool;
+    }
 
     public List<Order> getOrders() { return orders; }
     public String getName() { return name; }

@@ -4,68 +4,67 @@ public class RestaurantManagementSystem {
 
         System.out.println("--- 🍔 Initializing Restaurant Management System ---");
 
-        // 1. Create MenuItem Instances
-        MenuItem burger = new MenuItem(101, "Classic Burger", 12.99);
-        MenuItem fries = new MenuItem(102, "Large Fries", 4.50);
-        MenuItem soda = new MenuItem(103, "Cola", 2.00);
-        MenuItem steak = new MenuItem(201, "Ribeye Steak", 35.00);
+        // 1. Создаем объекты FoodItem и DrinkItem (вместо старого MenuItem)
+        // Теперь мы используем Наследование и Полиморфизм
+        BaseItem burger = new FoodItem("Classic Burger", 12.99, 600);
+        BaseItem fries = new FoodItem("Large Fries", 4.50, 400);
+        BaseItem soda = new DrinkItem("Cola", 2.50, true);
+        BaseItem steak = new FoodItem("Ribeye Steak", 35.00, 800);
 
-        // Demonstrate Getter/Setter for MenuItem
-        soda.setPrice(2.50);
-        soda.setAvailable(false); // Soda is currently out of stock
+        // Демонстрация инкапсуляции: меняем цену через сеттер в BaseItem
+        soda.setPrice(2.75);
 
-        System.out.println("\n--- MenuItem Details (After updates) ---");
-        System.out.println(burger.toString());
-        System.out.println("Soda Price: " + soda.getPrice() + ", Available: " + soda.isAvailable());
+        System.out.println("\n--- Обновленные детали блюд ---");
+        System.out.println(burger.getDescription()); // Полиморфизм в действии
+        System.out.println(soda.getDescription());
 
-        // 2. Create Order Instances
+        // 2. Работа с заказами
         Order order1 = new Order(1);
-        order1.addItem(burger, 1);
-        order1.addItem(fries, 2); // 2 Large Fries
-        // order1.addItem(soda, 1); // Cannot add soda, out of stock (in a real system, you'd check this)
+        order1.addItem(burger, 1); // Теперь принимает BaseItem без ошибок
+        order1.addItem(fries, 2);
 
         Order order2 = new Order(2);
         order2.addItem(steak, 1);
         order2.addItem(burger, 1);
 
-        // Complete one order
+        // Отмечаем заказ как выполненный
         order1.setCompleted(true);
 
-        System.out.println("\n--- Order Details ---");
-        System.out.println("Order 1: " + order1.toString());
-        System.out.println("Order 2: " + order2.toString());
+        System.out.println("\n--- Детали заказов ---");
+        System.out.println(order1.toString());
+        System.out.println(order2.toString());
 
-        // 3. Create Restaurant Instances
+        // 3. Работа с рестораном (Data Pool)
         Restaurant fastEats = new Restaurant("Fast Eats", "123 Main St");
-        Restaurant fineDine = new Restaurant("Fine Dine", "456 Oak Ave");
 
-        // Add orders to the restaurant
+        // Добавляем блюда в Пул Данных (menuPool) для поиска и фильтрации
+        fastEats.addToMenu(burger);
+        fastEats.addToMenu(fries);
+        fastEats.addToMenu(soda);
+        fastEats.addToMenu(steak);
+
         fastEats.addOrder(order1);
         fastEats.addOrder(order2);
 
-        // Demonstrate Getter for Restaurant
-        System.out.println("\n--- Restaurant Details ---");
-        System.out.println(fastEats.getName() + " is located at " + fastEats.getAddress());
-        System.out.println(fastEats.toString());
-        System.out.println(fineDine.toString());
+        // 4. Демонстрация поиска и фильтрации
+        System.out.println("\n--- Поиск и Фильтрация ---");
 
-        // 4. Compare Multiple Objects
+        // Сортировка по цене
+        fastEats.sortByPrice();
+        System.out.println("Меню после сортировки:");
+        fastEats.getMenu().forEach(item -> System.out.println(item.toString()));
 
-        // Comparing Orders
-        System.out.println("\n--- Object Comparison ---");
-        boolean orderComparison = order2.isMoreExpensiveThan(order1);
-        System.out.println("Is Order 2 more expensive than Order 1? " + orderComparison + " (Order 1: $" + order1.getTotalAmount() + ", Order 2: $" + order2.getTotalAmount() + ")");
+        // Поиск
+        BaseItem found = fastEats.findItem("Cola");
+        System.out.println("\nРезультат поиска 'Cola': " + (found != null ? found.getDescription() : "Не найдено"));
 
-        // Comparing MenuItems
-        boolean itemComparison = burger.isCheaperThan(steak);
-        System.out.println("Is Burger cheaper than Ribeye Steak? " + itemComparison);
+        // Фильтрация (блюда дешевле 10$)
+        System.out.println("\nБлюда дешевле $10.00:");
+        fastEats.filterByMaxPrice(10.00).forEach(item -> System.out.println(item.getDescription()));
 
-        // Comparing Restaurants
-        Restaurant fastEatsDuplicate = new Restaurant("Fast Eats", "789 Pine St");
-        boolean restaurantComparison = fastEats.hasSameName(fastEatsDuplicate);
-        System.out.println("Do Fast Eats and Fast Eats Duplicate have the same name? " + restaurantComparison);
-
-        // Standard Object Reference Comparison (comparing memory addresses)
-        System.out.println("Are fastEats and fastEatsDuplicate the same object? " + (fastEats == fastEatsDuplicate));
+        // 5. Сравнение объектов (используя переопределенный equals)
+        System.out.println("\n--- Сравнение объектов ---");
+        BaseItem anotherBurger = new FoodItem("Classic Burger", 12.99, 600);
+        System.out.println("Это тот же самый бургер? " + burger.equals(anotherBurger));
     }
 }
