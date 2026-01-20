@@ -47,11 +47,11 @@ public class RestaurantManagementSystem {
         fastEats.addOrder(order2);
 
         // 4. Демонстрация поиска и фильтрации
-        System.out.println("\n--- Поиск и Фильтрация ---");
+        System.out.println("\n--- Search and Filtering ---");
 
         // Сортировка по цене
         fastEats.sortByPrice();
-        System.out.println("Меню после сортировки:");
+        System.out.println("Menu after filter:");
         fastEats.getMenu().forEach(item -> System.out.println(item.toString()));
 
         // Поиск

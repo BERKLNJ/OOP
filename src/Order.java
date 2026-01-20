@@ -38,6 +38,6 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Заказ #" + orderId + " | Итого: " + totalAmount + " KZT | Статус: " + (isCompleted ? "Готов" : "В процессе");
+        return "Order #" + orderId + " | Total: " + totalAmount + " KZT | Status: " + (isCompleted ? "Ready" : "In process");
     }
 }
